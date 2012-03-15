@@ -1,0 +1,17 @@
+{
+   "background_page": "background.html",
+   "content_scripts": [ {
+      "all_frames": true,
+      "css": [ "/jQueryUI/css/overcast/jquery-ui-1.8.18.custom.css" ],
+      "js": [ "jquery-1.7.1.min.js", "jquery-ui-1.8.18.custom.min.js", "moment.js", "querysaver.js" ],
+      "matches": [ "http://*/phpminiadmin/*", "http://*/phpmyadmin/*" ],
+      "run_at": "document_idle"
+   } ],
+   "description": "Don't lose your query while working on phpminiadmin.",
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDAv3lMjAbvFU/z907i1W58ukcOfWd6n4rosTlh3fQYJaA5ER0z+y/cPlqKZ2hhg98GNOM6BEObSHf7D3KDvDQQxUQLLY2Saab77SQNXwxzYRiTlAv9lslsS9hrsm95wXSVhi4Pqcatw45TtLnJXrKG4AbpY3zs9GaDFuRTiaOu9wIDAQAB",
+   "minimum_chrome_version": "1.0",
+   "name": "Don't Lose your Query",
+   "permissions": [ "https://*/phpminiadmin/*", "tabs", "http://*/phpminiadmin/*", "http://*/phpmyadmin/*" ],
+   "update_url": "http://clients2.google.com/service/update2/crx",
+   "version": "1.2.8"
+}
