@@ -1,3 +1,4 @@
+//Don't Lose Your Query Source Code
 (function( $ ) {
 		$.widget( "ui.combobox", {
 			_create: function() {
