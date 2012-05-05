@@ -179,10 +179,16 @@ $(document).ready(function(){
 			$(this).select();
 	});
 
-	$("table.res").wrap($('<div></div>', {id: 'tablewrap'}));
-	//$('#tablewrap').attr({id : 'sqldr'});
-	//$('.sqldr').attr('id', 'sqldr');
-	$("#tablewrap").wrap($("<div></div>",{ id : 'tabbed'}))
+	if(!!$("table.res").length){
+		$("table.res").wrap($('<div></div>', {id: 'tablewrap'}));
+		//$('#tablewrap').attr({id : 'sqldr'});
+		//$('.sqldr').attr('id', 'sqldr');
+		$("#tablewrap").wrap($("<div></div>",{ id : 'tabbed'}));
+	}else{
+		$('center').after($('<table/>',{'class':'res'}));
+		$("table.res").wrap($('<div></div>', {id: 'tablewrap'}));
+		$("#tablewrap").wrap($("<div></div>",{ id : 'tabbed'}));
+	}
    
 	$("#tabbed").prepend(
             $("<ul>").append(
