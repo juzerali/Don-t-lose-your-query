@@ -137,7 +137,7 @@ DLQ.History = DLQ.getHistoryArray();
 
 $(document).ready(function(){
 	
-	$('form[name="DF"]').submit(function(e){
+	$('form').submit(function(e){
 		saveQuery();
 		return true;
 	});
@@ -146,8 +146,8 @@ $(document).ready(function(){
 		return true;
 	});
 
-	$("textarea").attr({tabindex : 4, placeholder: "Type substring from your previous queries to get auto suggestion"})
-		.autocomplete({minLength : 3, autoFocus : true, source : DLQ.getHistoryArray()});
+	$("textarea").attr({tabindex : 4, placeholder: "Press CTRL+Enter to execute Query"})
+		.autocomplete({minLength : 3, autoFocus : false, source : DLQ.getHistoryArray()});
 
 
 	$('.delete').live('click',function(e){
@@ -165,7 +165,8 @@ $(document).ready(function(){
 	$('.queryText').live('click',function(e){
 		e.preventDefault();
 		var text=$(this).text();
-		$('textarea').val(text);
+		$('textarea').val(text).focus();
+		if(e.ctrlKey) $('form').submit();
 		scroll(0,0);
 	});
 
@@ -176,15 +177,16 @@ $(document).ready(function(){
 		.on("focus click", function(e){
 			e.preventDefault();
 			$(this).select();
-		});
+	});
 
-	$('.sqldr').attr({id : 'sqldr'});
+	$("table.res").wrap($('<div></div>', {id: 'tablewrap'}));
+	//$('#tablewrap').attr({id : 'sqldr'});
 	//$('.sqldr').attr('id', 'sqldr');
-	$("#sqldr").wrap($("<div></div>",{ id : 'tabbed'}))
+	$("#tablewrap").wrap($("<div></div>",{ id : 'tabbed'}))
    
 	$("#tabbed").prepend(
             $("<ul>").append(
-                    $("<li>").append($("<a>").attr({href : "#sqldr"}).text("Result"))
+                    $("<li>").append($("<a>").attr({href : "#tablewrap"}).text("Result"))
                     .after($("<li>").append($("<a>").attr({href : "#recent"}).text("Recent")))
                     .after($("<li>").append($("<a>").attr({href : "#saved"}).text("Saved")))
                 )
@@ -207,7 +209,7 @@ $(document).ready(function(){
                         );
              
 	//$('#tabbed').wrap("<div class='demo'/>");
-	$('#tabbed').tabs({selected: !!$('#sqldr > *').html()?0:1 }); //
+	$('#tabbed').tabs({selected: !!$('#tablewrap > *').html()?0:1 }); //
 	//insertIntoDOM(map);
 
 	$('.delete').css('cursor','pointer');
@@ -221,6 +223,12 @@ $(document).ready(function(){
 	insertArrayIntoDOM();
 
 	$('.queryText').css('cursor','pointer');
+
+	$('textarea').keydown(function (e) {
+		  if (e.ctrlKey && e.keyCode == 13) {
+			$('form').submit();
+		  }
+		});
 });
 
 
