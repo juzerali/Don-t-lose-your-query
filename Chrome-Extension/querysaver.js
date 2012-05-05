@@ -229,6 +229,13 @@ $(document).ready(function(){
 			$('form').submit();
 		  }
 		});
+	$('body').keypress(function(e){
+		if(e.which == 47 && e.target.tagName.toLowerCase()!='textarea' && e.target.tagName.toLowerCase()!='input'){
+			$('textarea').focus(); 
+			return false;
+		}
+		return true;
+	});
 });
 
 
