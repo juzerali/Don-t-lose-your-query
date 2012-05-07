@@ -136,57 +136,49 @@ DLQ.History = DLQ.getHistoryArray();
 
 
 $(document).ready(function(){
+	var $form = $("form")
+	,	$textarea = $("textarea")
+	,	$selectdb = $("select[name='db']");
 	
-	$('form').submit(function(e){
-		saveQuery();
-		return true;
-	});
-	$('select[name="db"]').change(function(e){
+	$form.submit(function(e){
 		saveQuery();
 		return true;
 	});
 
-	$("textarea").attr({tabindex : 4, placeholder: "Press CTRL+Enter to execute Query"})
-		.autocomplete({minLength : 3, autoFocus : false, source : DLQ.getHistoryArray()});
+	$selectdb.change(function(e){
+		saveQuery();
+		return true;
+	})
+	.combobox({delay: 0, autoFocus: true})
+	.val()=="*"?$('input.ui-autocomplete-input').focus():$textarea.focus();;
 
-
-	$('.delete').live('click',function(e){
-		e.preventDefault();
-		var tr = $(this).parent().parent('tr');
-		tr.slideUp(1);
-		DLQ.History = DLQ.getHistoryArray();
-		DLQ.History.splice(tr.data('key'),1);
-		localStorage["DLQHistory"] = JSON.stringify(DLQ.History);
-		e.stopPropogation();
+	$textarea.attr({tabindex : 4, placeholder: "Press CTRL+Enter to execute Query"})
+	.autocomplete({minLength : 3, autoFocus : false, source : DLQ.getHistoryArray()})
+	.keydown(function (e) {
+	  if (e.ctrlKey && e.keyCode == 13) {
+		$form.submit();
+	  }
 	});
-
-
-
-	$('.queryText').live('click',function(e){
-		e.preventDefault();
-		var text=$(this).text();
-		$('textarea').val(text).focus();
-		if(e.ctrlKey) $('form').submit();
-		scroll(0,0);
-	});
-
-	var combo = $('select[name="db"]').combobox({delay: 0, autoFocus: true});
-
 
 	$("input.ui-autocomplete-input").attr({tabindex : '3'})
-		.on("focus click", function(e){
-			e.preventDefault();
-			$(this).select();
+	.on("focus click", function(e){
+		e.preventDefault();
+		this.select();
 	});
-
-	if(!!$("table.res").length){
-		$("table.res").wrap($('<div></div>', {id: 'tablewrap'}));
-		//$('#tablewrap').attr({id : 'sqldr'});
-		//$('.sqldr').attr('id', 'sqldr');
-		$("#tablewrap").wrap($("<div></div>",{ id : 'tabbed'}));
+	
+	var $tableres = $("table.res")
+	,	$center = $('center')
+	,	$sqldr = $('.sqldr')
+	;
+	if(!!$tableres.length){
+		$tableres.wrap($('<div></div>', {id: 'tablewrap'}));
+		$('#tablewrap').wrap($("<div></div>",{ id : 'tabbed'}));
+	}else if($center.length){
+		$center.after($('<table/>',{'class':'res'}));
+		$tableres.wrap($('<div></div>', {id: 'tablewrap'}));
+		$('#tablewrap').wrap($("<div></div>",{ id : 'tabbed'}));
 	}else{
-		$('center').after($('<table/>',{'class':'res'}));
-		$("table.res").wrap($('<div></div>', {id: 'tablewrap'}));
+		$sqldr.wrap($('<div></div>', {id: 'tablewrap'}));
 		$("#tablewrap").wrap($("<div></div>",{ id : 'tabbed'}));
 	}
    
@@ -194,11 +186,9 @@ $(document).ready(function(){
             $("<ul>").append(
                     $("<li>").append($("<a>").attr({href : "#tablewrap"}).text("Result"))
                     .after($("<li>").append($("<a>").attr({href : "#recent"}).text("Recent")))
-                    .after($("<li>").append($("<a>").attr({href : "#saved"}).text("Saved")))
+                    //.after($("<li>").append($("<a>").attr({href : "#saved"}).text("Saved")))
                 )
-        );
-                        
-	$('#tabbed').append($("<div>", {id : "recent"})
+        ).append($("<div>", {id : "recent"})
                             .append($("<table>",{
                                 border: "0",
                                 cellpadding : "1",
@@ -206,42 +196,52 @@ $(document).ready(function(){
                                 width : "100%",
                                 "class" : "res queryHolder"
                             } ))
-    );
-
+    )
+	.tabs({selected: !!$('table > *').html()?0:1 });
+/*
 	$('#tabbed').append($("<div>", {id : 'saved'})
                         .append($("<b>")
                                 .text("Coming Soon...")
                                 )
                         );
-             
-	//$('#tabbed').wrap("<div class='demo'/>");
-	$('#tabbed').tabs({selected: !!$('#tablewrap > *').html()?0:1 }); //
-	//insertIntoDOM(map);
+      */       
 
-	$('.delete').css('cursor','pointer');
+
 	$('tr').toggleClass('e').toggleClass('o');
 	
-	$('select').val()=="*"?$('input.ui-autocomplete-input').focus():$('textarea').focus();
 
 	$("input:submit").attr({tabindex : 5});
 	$("input[name='Clear']").attr({tabindex : 6});
 	
 	insertArrayIntoDOM();
 
-	$('.queryText').css('cursor','pointer');
-
-	$('textarea').keydown(function (e) {
-		  if (e.ctrlKey && e.keyCode == 13) {
-			$('form').submit();
-		  }
-		});
 	$('body').keypress(function(e){
 		if(e.which == 47 && e.target.tagName.toLowerCase()!='textarea' && e.target.tagName.toLowerCase()!='input'){
-			$('textarea').focus(); 
+			$textarea.select(); 
 			return false;
 		}
 		return true;
 	});
+
+	$('.delete').live('click',function(e){
+		e.preventDefault();
+		var tr = $(this).parent().parent('tr');
+		tr.fadeOut('slow');
+		DLQ.History = DLQ.getHistoryArray();
+		DLQ.History.splice(tr.data('key'),1);
+		localStorage["DLQHistory"] = JSON.stringify(DLQ.History);
+		e.stopPropogation();
+	}).css('cursor','pointer');
+
+
+
+	$('.queryText').live('click',function(e){
+		e.preventDefault();
+		var text=$(this).text();
+		$textarea.val(text).focus();
+		if(e.ctrlKey) $form.submit();
+		scroll(0,0);
+	}).css('cursor','pointer');
 });
 
 
@@ -320,7 +320,7 @@ function removeOld(){
 function saveQuery(){
 	var query = $('textarea').val();
 	if(!query || !query.length>0 || query=='undefined') {return;}
-	DLQ.History = JSON.parse(localStorage['DLQHistory']);
+	DLQ.History = eval('('+localStorage['DLQHistory']+')');
 	if(DLQ.History.length > 2000) DLQ.History.length = 2000;
 	$.each(DLQ.History, function(key,value){
 		if(!!value && value.toLowerCase() == query.toLowerCase()){
