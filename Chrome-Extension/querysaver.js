@@ -4,7 +4,7 @@ DLQ.issueURL = 'https://github.com/juzerali/Don-t-lose-your-query/issues';
 DLQ.reviewURL = 'https://chrome.google.com/webstore/detail/ffimgldnoigmlcofmfkfcjechbdkipph/reviews?hl=en-GB';
 var extension={};
  extension.getURL = chrome.extension?chrome.extension.getURL:require("self").data.url ;
-DLQ.imgURL = extension.getURL("delete.gif");
+
 
 (function( $ ) {
 		$.widget( "ui.combobox", {
