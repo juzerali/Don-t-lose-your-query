@@ -1,5 +1,7 @@
 var DLQ = {};
-DLQ.gitURL = "https://github.com/juzerali/Don-t-lose-your-query--Chrome-Extension";
+DLQ.gitURL = "https://github.com/juzerali/Don-t-lose-your-query";
+DLQ.issueURL = 'https://github.com/juzerali/Don-t-lose-your-query/issues';
+DLQ.reviewURL = 'https://chrome.google.com/webstore/detail/ffimgldnoigmlcofmfkfcjechbdkipph/reviews?hl=en-GB';
 var extension={};
  extension.getURL = chrome.extension?chrome.extension.getURL:require("self").data.url ;
 DLQ.imgURL = extension.getURL("delete.gif");
@@ -153,12 +155,17 @@ $(document).ready(function(){
 	.val()=="*"?$('input.ui-autocomplete-input').focus():$textarea.focus();;
 
 	$textarea.attr({tabindex : 4, placeholder: "Press CTRL+Enter to execute Query"})
-	.autocomplete({minLength : 3, autoFocus : false, source : DLQ.getHistoryArray()})
-	.keydown(function (e) {
-	  if (e.ctrlKey && e.keyCode == 13) {
-		$form.submit();
-	  }
-	});
+		.autocomplete({minLength : 3, autoFocus : false, source : DLQ.getHistoryArray()})
+		.focus(function(e){
+			var len = this.value.length*2;
+			this.setSelectionRange(len,len);
+			scroll(0,0);
+		})	
+		.keydown(function (e) {
+			if (e.ctrlKey && e.keyCode == 13) {
+				$form.submit();
+			}
+		});
 
 	$("input.ui-autocomplete-input").attr({tabindex : '3'})
 	.on("focus click", function(e){
@@ -171,8 +178,11 @@ $(document).ready(function(){
 	,	$sqldr = $('.sqldr')
 	;
 	if(!!$tableres.length){
-		$tableres.wrap($('<div></div>', {id: 'tablewrap'}));
+		$tableres.removeClass('res').addClass('table table-striped table-bordered')
+			.css('position', 'absolute')
+			.wrap($('<div></div>', {id: 'tablewrap'}));
 		$('#tablewrap').wrap($("<div></div>",{ id : 'tabbed'}));
+		$('tr').removeClass('e').removeClass('o');
 	}else if($center.length){
 		$center.after($('<table/>',{'class':'res'}));
 		$tableres.wrap($('<div></div>', {id: 'tablewrap'}));
@@ -181,43 +191,54 @@ $(document).ready(function(){
 		$sqldr.wrap($('<div></div>', {id: 'tablewrap'}));
 		$("#tablewrap").wrap($("<div></div>",{ id : 'tabbed'}));
 	}
+
+	$("#tablewrap").addClass('tab-pane active')
+	.wrap(
+		$("<div></div>", {'id':'tab-content', 'class': 'tab-content'})
+	);
+
+	$("#tab-content").append(
+			$("<div>", {id : "recent", 'class': 'tab-pane'})
+            .append(
+				$("<table/>",{
+				    "class" : "queryHolder table table-striped table-bordered"
+				} 
+		)
+	));
    
-	$("#tabbed").prepend(
-            $("<ul>").append(
-                    $("<li>").append($("<a>").attr({href : "#tablewrap"}).text("Result"))
-                    .after($("<li>").append($("<a>").attr({href : "#recent"}).text("Recent")))
-                    //.after($("<li>").append($("<a>").attr({href : "#saved"}).text("Saved")))
-                )
-        ).append($("<div>", {id : "recent"})
-                            .append($("<table>",{
-                                border: "0",
-                                cellpadding : "1",
-                                cellspacing : "1",
-                                width : "100%",
-                                "class" : "res queryHolder"
-                            } ))
-    )
-	.tabs({selected: !!$('table > *').html()?0:1 });
-/*
-	$('#tabbed').append($("<div>", {id : 'saved'})
-                        .append($("<b>")
-                                .text("Coming Soon...")
-                                )
-                        );
-      */       
+	$("#tabbed").addClass('tabbable')
+	.prepend(
+		 $("<ul>", {'class': 'nav nav-tabs'})
+		 .append(
+			$("<li>" ,{'class':'active'}).append($("<a>").attr({href : "#tablewrap", 'data-toggle': 'tab'}).text("Result"))
+            .after($("<li>").append($("<a>").attr({href : "#recent", 'data-toggle': 'tab'}).text("Recent")))
+                    .after($("<li>").append($("<a>").attr({href : "#meta", 'data-toggle': 'tab'}).text("Meta")))
+             //)
+        )
+    );
 
-
-	$('tr').toggleClass('e').toggleClass('o');
+	$('#tab-content').append($("<div>", {id : 'meta', 'class': 'tab-pane'})
+                        .append($('<div>', {'class': ''})
+								.append(
+									$('<a/>', {'class':'btn btn-danger', 'href': DLQ.issueURL, 'target': '_blank'})
+									.prepend($("<i>", {'class': 'icon icon-flag'})
+									.after(" Report Bug")), "  ",
+									$("<a/>",{'class': 'btn btn-success', href: DLQ.reviewURL, 'target': '_blank'})
+									.prepend($("<i>", {'class': 'icon icon-pencil'})
+									.after(" Write a Review"))
+								)
+                         )
+                     );
 	
 
-	$("input:submit").attr({tabindex : 5});
-	$("input[name='Clear']").attr({tabindex : 6});
+	$("input:submit").attr({tabindex : 5}).addClass('btn btn-primary');
+	$("input[name='Clear']").attr({tabindex : 6}).addClass('btn btn-warning');
 	
 	insertArrayIntoDOM();
 
 	$('body').keypress(function(e){
-		if(e.which == 47 && e.target.tagName.toLowerCase()!='textarea' && e.target.tagName.toLowerCase()!='input'){
-			$textarea.select(); 
+		if(e.which == 47 && e.target.tagName.toLowerCase()!='textarea' /*&& e.target.role?e.target.role.toLowerCase()!='textbox':true*/){
+			$textarea.focus(); 
 			return false;
 		}
 		return true;
@@ -242,6 +263,10 @@ $(document).ready(function(){
 		if(e.ctrlKey) $form.submit();
 		scroll(0,0);
 	}).css('cursor','pointer');
+
+	if(($err = $(".err")).text().length){
+		$err.addClass('alert alert-error');
+	}
 });
 
 
@@ -268,48 +293,6 @@ function prepareQueryArray(){
 	return sortedMap;
 	
 }
-
-
-function insertIntoDOM(map){
-	var i =0;
-	var eoBool = false;
-	var eo = 'o';
-	$(".queryHolder").append($("<tr>", {"class" : "h"})
-                        .append(
-								//$("<th>").text("Time"),
-								$("<th>").text("Recent Queries")
-							)
-                    );
-		$.each(map, function(key,value){
-			eoBool = !eoBool;
-			eo = eoBool?'e':'o';
-			if(i==50) return;
-			if(!!value && value!='undefined'){
-				$(".queryHolder").append( $("<tr></tr>", {
-                                                        "class" : eo,
-                                                        "data-key" : key,
-                                                        title : (function(){return new Date(key);})()
-				                })
-                                .append($("<td>").text(moment(parseInt(key)).fromNow())
-                                                .prepend($("<img>",{
-                                                                    "class" : "delete",
-                                                                    src : DLQ.imgURL,
-																	alt : 'delete'
-                                                        }))
-                                                        , 
-                                        
-                                        $("<td>",{"class" : "queryText"})
-                                        .text(value)
-                                )
-                      )
-                ;
-				i++;
-			}
-		});
-}
-
-
-
 
 function removeOld(){
 	var i=0;
@@ -344,10 +327,11 @@ function insertArrayIntoDOM(){
 	var eoBool = false;
 	var eo = 'o';
 	DLQ.History = DLQ.getHistoryArray();
-	$(".queryHolder").append($("<tr>", {"class" : "h"})
+	$(".queryHolder").append($("<tr>", {"class" : ""})
                         .append(
-								//$("<th>").text("Time"),
-								$("<th>").text("Recent Queries")
+								$("<th>").text("Panel"),
+								$("<th>").text("Recent Queries (Total "+DLQ.History.length+") ")
+									.append($("<span/>", {'class': 'label label-info'}).text("'Ctrl + Left-Click' to execute"))
 							)
                     );
 		$.each(DLQ.History, function(key,value){
@@ -356,18 +340,22 @@ function insertArrayIntoDOM(){
 			if(i==50) return;
 			if(!!value && value!='undefined'){
 				$(".queryHolder").append( $("<tr></tr>", {
-                                                        "class" : eo,
+                                                        //"class" : eo,
                                                         "data-key" : key
 				                })
-                                .append(/*$("<td>").text(moment(parseInt(key)).fromNow())
-                                                        , */
+                                .append($('<td/>').append($("<a>",{
+                                                                    "class" : "delete btn btn-danger",
+																	rel : 'tooltip',
+																	title: 'Delete',
+																	href : '#'
+															})
+															.prepend(
+																$("<i>", {'class': 'icon-trash'})
+															)), 
                                         
                                         $("<td>",{"class" : "queryText"})
-                                        .text(value).prepend($("<img>",{
-                                                                    "class" : "delete",
-                                                                    src : DLQ.imgURL,
-																	alt : 'delete'
-                                                        }))
+                                        .text(value).prepend(		
+														)
                                 )
                       )
                 ;
