@@ -5,7 +5,6 @@ DLQ.reviewURL = 'https://chrome.google.com/webstore/detail/ffimgldnoigmlcofmfkfc
 var extension={};
  extension.getURL = chrome.extension?chrome.extension.getURL:require("self").data.url ;
 
-
 (function( $ ) {
 		$.widget( "ui.combobox", {
 			_create: function() {
