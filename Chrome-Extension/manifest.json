@@ -4,7 +4,9 @@
       "all_frames": true,
       "css": [ "UI/css/jquery-ui-1.8.20.custom.css", "/UI/css/bootstrap.min.css" ],
       "js": [ "/UI/js/jquery-1.7.2.min.js", "/UI/js/jquery-ui-1.8.20.custom.min.js", "UI/js/bootstrap.min.js", "querysaver.js" ],
-      "matches": [ "http://*/phpminiadmin/*", "http://*/phpmyadmin/*", "http://demo.galaxywebservices.com/steveshaw/phpminiadmin.php*", "http://demo.phpmyadmin.net/*" ],
+      "matches": [ "http://*/phpminiadmin/*", "http://*/phpmyadmin/*", "http://*/devadmin/*",
+                   "https://*/phpminiadmin/*", "https://*/phpmyadmin/*", "https://*/devadmin/*",
+                   "http://demo.galaxywebservices.com/steveshaw/phpminiadmin.php*", "http://demo.phpmyadmin.net/*" ],
       "run_at": "document_idle"
    } ],
    "description": "Don't lose your query while working on phpminiadmin.",
@@ -17,5 +19,5 @@
    "name": "Don't Lose your Query",
    "permissions": [ "https://*/phpminiadmin/*", "tabs", "http://*/phpminiadmin/*", "http://*/phpmyadmin/*" ],
    "update_url": "http://clients2.google.com/service/update2/crx",
-   "version": "1.7.1"
+   "version": "1.7.2"
 }
